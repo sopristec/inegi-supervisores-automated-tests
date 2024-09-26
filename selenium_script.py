@@ -95,6 +95,7 @@ def upload_file(file_data):
                 (
                     By.XPATH,
                     "(.//*[normalize-space(text()) and normalize-space(.)='Paquetes integrados'])[1]/following::div[3]",
+                    # "//*[contains(text(), 'Integrar paquete ...')]",
                 )
             )
         ).click()
@@ -104,10 +105,11 @@ def upload_file(file_data):
 
         print("uploaded")
         # Wait for 10 seconds for file to upload
-        time.sleep(10)
+        # time.sleep(60)
+        # print("uploaded")
 
         # Click on the button
-        WebDriverWait(driver, 20).until(
+        WebDriverWait(driver, 200).until(
             EC.element_to_be_clickable(
                 (
                     By.XPATH,
@@ -115,6 +117,7 @@ def upload_file(file_data):
                 )
             )
         ).click()
+        print("finish")
 
         WebDriverWait(driver, 20).until(
             EC.element_to_be_clickable(
@@ -138,9 +141,6 @@ def upload_file(file_data):
         driver.get(
             "https://opera.inegi.org.mx/opera.auth/Account/Login?ReturnUrl=%2Fopera.auth%2Fconnect%2Fauthorize%2Fcallback%3Fclient_id%3Dopera.web%26redirect_uri%3Dhttps%253A%252F%252Fopera.inegi.org.mx%252Fopera.web%252Fauth-callback%26response_type%3Dcode%26scope%3Dopenid%2520profile%2520access%26state%3Dbcdc84f40da34e8ebad5734fbb6cda69%26code_challenge%3DtZakpLcxAk7aVfrTOAMxOCsoKaRUhvsQo8tDSfaHb08%26code_challenge_method%3DS256%26response_mode%3Dquery"
         )
-
-        # Spread the uploads evenly within an hour
-        # time.sleep(3600 / no_files)
 
     finally:
         # Close the browser

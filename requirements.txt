@@ -3,3 +3,5 @@ gunicorn==21.0.0
 requests==2.31.0
 selenium==4.22.0
 redis
+aiohttp
+asyncio
