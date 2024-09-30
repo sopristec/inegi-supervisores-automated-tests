@@ -1,0 +1,16 @@
+curl 'https://opera.inegi.org.mx/opera.auth/connect/token' \
+  -H 'Accept: application/json' \
+  -H 'Accept-Language: en-US,en;q=0.9' \
+  -H 'Connection: keep-alive' \
+  -H 'Content-Type: application/x-www-form-urlencoded' \
+  -H 'Cookie: .AspNetCore.Antiforgery.4fJZDYJKlCY=CfDJ8FHncaVeJ7BGielGJsGKkEJifW-W1UNhdVbNsoQuUv6aUPevJcfWwmuiGPmWb27wtF9y9hFLIbe20KBckUwqxKody9NWMWP9Q6SwqC4Tt1lqc_2fo1QCuLL-OXpzYp1IfM6dKyzC4EEB_ruKHotOuwU; idsrv.session=1EEC6BC1286D6FE46B2D093A41F77309; .AspNetCore.Identity.Application=CfDJ8FHncaVeJ7BGielGJsGKkEJ7xe9FZmdF4CFvejVTIexlMgw8QZ-9XLjz1A9RZPQM_uBg-qSDQ_Bss4qSnM47flWPMksF87n9xDzgpvOqDz_-lo4zwn3Fe0Dn1WGPtm22DxGSZFga-2O9EtgjJ98tDrpp6nX5UOMF17GMWvmxCQDZIj4y5VKVW1zX6emD9nB5TPg-oxlG_-3Ib54i0jMNmiHjOzU4QZkLCz_oMTnj2gkeLueaZ4U2pCfug47d-xDH-xlkZveo--h21pu-uCDaJVIkHZT53ZjO5d2KhWZ-HqLEGq2fSrrnQ8c1fiqi_h8Eo2L6ELDTJ2wxhqYS6QQn9dsf8et-cATYb3gZaIDUAOhibEggfotPNlhTFd5TzyWNwvYEAnSbUGtzn_UzDbJW2Wtrs3sVYmPIaBXlWAaYVLSAMFvtejX4KvuuLB4KoLFA027N4H93nvgFp-FbfRSdqWiqnQi5tabjaKPNiC-EQaYpp7yS-DOkkZWTN8VuAPufl8y5jkmz-fPJkQGkQIwq4r1Yf8WXusLbx_LSsNe7R91xnQvBZIRfwNLHefPNtuPa3ir9FWACWCVahjYiRFJhBmmcFNPEUpswF6_EgtgEG5dhwvGC_IV5-y15kmhEcXi4j5BzKklAs-pd79K7aS5cS3duAyleXW98kFWxvbdl9S-p; BIGipServerLB_opera=4093810954.37407.0000' \
+  -H 'Origin: https://opera.inegi.org.mx' \
+  -H 'Referer: https://opera.inegi.org.mx/opera.web/auth-callback?code=A111E2AF840E8CADB73156AA37183EB925F178B92C6B9C35D88B1F4F152EDD09&scope=openid%20profile%20access&state=c6fd9f28823047608e13e8eed3163d92&session_state=K3KfsHnS0y6VMf0EQZmpQTMVdLgDaheN63AZcGoaArA.759B2949BE8B8D9773D160AD11599767' \
+  -H 'Sec-Fetch-Dest: empty' \
+  -H 'Sec-Fetch-Mode: cors' \
+  -H 'Sec-Fetch-Site: same-origin' \
+  -H 'User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36' \
+  -H 'sec-ch-ua: "Not;A=Brand";v="24", "Chromium";v="128"' \
+  -H 'sec-ch-ua-mobile: ?0' \
+  -H 'sec-ch-ua-platform: "Linux"' \
+  --data-raw 'grant_type=authorization_code&redirect_uri=https%3A%2F%2Fopera.inegi.org.mx%2Fopera.web%2Fauth-callback&code=A111E2AF840E8CADB73156AA37183EB925F178B92C6B9C35D88B1F4F152EDD09&code_verifier=7488708fc800426f867fb871ef4a4cea68c47fa8904a4b28a3226223f1280c4d799147c2dee441bf90d2f8a30e03b8e4&client_id=opera.web'

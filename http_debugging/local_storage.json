@@ -1,0 +1,12 @@
+{
+    "id": "fc960dbecf7b4c63bb4f123818d751ad",
+    "created": 1725312164,
+    "request_type": "si:r",
+    "code_verifier": "a2748fccf0b94bae83b5d40e67cceaa7eb644a620bd34cbbbdc361cf1f8ab2c9a43a5681ea1d47d4997a27ba6243aa8c",
+    "authority": "https://opera.inegi.org.mx/opera.auth",
+    "client_id": "opera.web",
+    "redirect_uri": "https://opera.inegi.org.mx/opera.web/auth-callback",
+    "scope": "openid profile access",
+    "extraTokenParams": {},
+    "response_mode": "query"
+}

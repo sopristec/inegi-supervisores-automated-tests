@@ -1,0 +1,15 @@
+curl 'https://opera.inegi.org.mx/opera.web/renew-callback?code=4A14A38F7EB77A9642F550EF1FBFBA727312B95D571798A5E48B507A571CC7D1&scope=openid%20profile%20access&state=53feba34a6d94a04aa0822dd00eb2db5&session_state=IDPzP7f6fGrQUWBKNiQEyTMdJhIb8kuu7f5zaoqUNVk.3BD077B9065F89F498588A160C7FD00D' \
+  -H 'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7' \
+  -H 'Accept-Language: en-US,en;q=0.9' \
+  -H 'Connection: keep-alive' \
+  -H 'Cookie: BIGipServerLB_opera=4093810954.37407.0000' \
+  -H 'Referer: https://opera.inegi.org.mx/opera.web/' \
+  -H 'Sec-Fetch-Dest: iframe' \
+  -H 'Sec-Fetch-Mode: navigate' \
+  -H 'Sec-Fetch-Site: same-origin' \
+  -H 'Sec-Fetch-User: ?1' \
+  -H 'Upgrade-Insecure-Requests: 1' \
+  -H 'User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36' \
+  -H 'sec-ch-ua: "Not;A=Brand";v="24", "Chromium";v="128"' \
+  -H 'sec-ch-ua-mobile: ?0' \
+  -H 'sec-ch-ua-platform: "Linux"'
