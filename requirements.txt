@@ -5,3 +5,5 @@ selenium==4.22.0
 redis
 aiohttp
 asyncio
+newrelic
+gevent

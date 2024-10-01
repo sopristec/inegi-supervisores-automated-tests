@@ -7,9 +7,41 @@ from selenium_script import upload_file
 app = Flask(__name__)
 
 
+def get_token_entrevistas():
+    url = "https://opera.inegi.org.mx/opera.auth/connect/token"
+    headers = {
+        "Content-Type": "application/x-www-form-urlencoded",
+        "Cookie": "BIGipServerLB_opera=4093810954.37407.0000",
+    }
+
+    data = {
+        "client_id": "sistema.verifica",
+        "grant_type": "password",
+        "username": "cen_gpo_verif",
+        "password": "Cpyv$2020",
+        "scope": "operaapi",
+    }
+
+    response = requests.post(url, headers=headers, data=data)
+
+    if response.status_code == 200:
+        # Parse the JSON response
+        token_info = response.json()
+        # Extract the access token
+        access_token = token_info.get("access_token")
+        print(f"Access Token: {access_token}")
+        return access_token
+    else:
+        print(f"Failed to retrieve token: {response.status_code}")
+        print(response.text)
+        return ""
+
+
 @app.route("/entrevistas", methods=["POST"])
 def entrevistas():
     try:
+        access_token = get_token_entrevistas()
+
         url = "https://opera.inegi.org.mx/opera.api/api/updown/uploadEntrevistaCompleta/48"
 
         file_path = "Entrevistas/Tenvio_012111111_20240813_55805750_PVOLUMEN.zip"
@@ -26,7 +58,7 @@ def entrevistas():
         return jsonify({"error": str(e)}), 500
 
 
-@app.route("/supervisor", methods=["POST"])
+@app.route("/supervisores", methods=["POST"])
 def supervisor():
     """
     Endpoint to receive messages from the worker.

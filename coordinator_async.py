@@ -1,6 +1,7 @@
 import asyncio
 from concurrent.futures import ThreadPoolExecutor
 import os
+import sys
 import time
 import random
 import json
@@ -50,7 +51,7 @@ async def distribute_requests(file_data, web_services):
         1 / requests_per_second if requests_per_second > 0 else 0
     )  # Time delay between each request
 
-    with ThreadPoolExecutor(max_workers=50 * num_services) as pool:
+    with ThreadPoolExecutor(max_workers=5 * num_services) as pool:
         loop = asyncio.get_event_loop()
         tasks = []
 
@@ -87,6 +88,12 @@ async def distribute_requests(file_data, web_services):
         await asyncio.gather(*tasks)
 
 
+# Function to read file and N times data from the JSON file
+def load_file_data(file_path):
+    with open(file_path, "r") as f:
+        return json.load(f)
+
+
 if __name__ == "__main__":
     # List of 10 web services
     HOST_WS_1 = os.environ.get("HOST_WS_1", "localhost")
@@ -101,36 +108,23 @@ if __name__ == "__main__":
     HOST_WS_10 = os.environ.get("HOST_WS_10", "localhost")
 
     WEB_SERVICES = [
-        f"http://{HOST_WS_1}:8000/supervisor",
-        f"http://{HOST_WS_2}:8000/supervisor",
-        f"http://{HOST_WS_3}:8000/supervisor",
-        f"http://{HOST_WS_4}:8000/supervisor",
-        f"http://{HOST_WS_5}:8000/supervisor",
-        f"http://{HOST_WS_6}:8000/supervisor",
-        f"http://{HOST_WS_7}:8000/supervisor",
-        f"http://{HOST_WS_8}:8000/supervisor",
-        f"http://{HOST_WS_9}:8000/supervisor",
-        f"http://{HOST_WS_10}:8000/supervisor",
+        f"http://{HOST_WS_1}:8000/supervisores",
+        f"http://{HOST_WS_2}:8000/supervisores",
+        f"http://{HOST_WS_3}:8000/supervisores",
+        f"http://{HOST_WS_4}:8000/supervisores",
+        f"http://{HOST_WS_5}:8000/supervisores",
+        f"http://{HOST_WS_6}:8000/supervisores",
+        f"http://{HOST_WS_7}:8000/supervisores",
+        f"http://{HOST_WS_8}:8000/supervisores",
+        f"http://{HOST_WS_9}:8000/supervisores",
+        f"http://{HOST_WS_10}:8000/supervisores",
     ]
 
     # Your JSON data
-    file_data = [
-        {
-            "username": "USUARIO.SIM10",
-            "file_name": "Eenvio_102111110_20240814_154132728_PVOLUMEN.zip",
-            "no_requests": 1,
-        },
-        {
-            "username": "USUARIO.SIM10",
-            "file_name": "Eenvio_102111120_20240814_100013521_PVOLUMEN.zip",
-            "no_requests": 2,
-        },
-        {
-            "username": "USUARIO.SIM10",
-            "file_name": "Eenvio_102111130_20240814_100438676_PVOLUMEN.zip",
-            "no_requests": 3,
-        },
-    ]
+    json_file_path = sys.argv[1]
+
+    # Load file information from JSON file
+    file_data = load_file_data(json_file_path)
 
     # Run the distribution of requests
     asyncio.run(distribute_requests(file_data, WEB_SERVICES))
