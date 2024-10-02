@@ -3,8 +3,10 @@
 ```sh
 export NEW_RELIC_LICENSE_KEY=<your_license_key>
 export NEW_RELIC_APP_NAME="inegi-censos"
+export ENTREVISTAS_PASSWORD=<password>
 
 newrelic-admin run-program gunicorn -b 0.0.0.0:8000 -w 20 app:app --timeout 200
+newrelic-admin run-program gunicorn app:app --worker-class gevent --workers 8 --threads 2 --bind 0.0.0.0:8000 --timeout 300
 ```
 
 # Run workers without NR

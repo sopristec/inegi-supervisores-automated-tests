@@ -13,12 +13,12 @@ def get_token_entrevistas():
         "Content-Type": "application/x-www-form-urlencoded",
         "Cookie": "BIGipServerLB_opera=4093810954.37407.0000",
     }
-
+    ENTREVISTAS_PASSWORD = os.environ.get("ENTREVISTAS_PASSWORD", "")
     data = {
         "client_id": "sistema.verifica",
         "grant_type": "password",
         "username": "cen_gpo_verif",
-        "password": "Cpyv$2020",
+        "password": f"{ENTREVISTAS_PASSWORD}",
         "scope": "operaapi",
     }
 
@@ -41,14 +41,24 @@ def get_token_entrevistas():
 def entrevistas():
     try:
         access_token = get_token_entrevistas()
+        # Add Bearer token to headers
+        headers = {"Authorization": f"Bearer {access_token}"}
 
         url = "https://opera.inegi.org.mx/opera.api/api/updown/uploadEntrevistaCompleta/48"
 
-        file_path = "Entrevistas/Tenvio_012111111_20240813_55805750_PVOLUMEN.zip"
+        # Get the JSON data from the request
+        message = request.get_json()
+
+        if not message:
+            return jsonify({"error": "No message data received"}), 400
+
+        file_name = message["file_name"]
+
+        file_path = f"Entrevistas/{file_name}"
 
         files = {"file": open(file_path, "rb")}
 
-        response = requests.post(url, files=files)
+        response = requests.post(url, files=files, headers=headers)
 
         return (
             jsonify({"status": "success", "inegi_response": response.text}),
