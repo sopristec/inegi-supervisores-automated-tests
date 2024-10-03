@@ -13,11 +13,14 @@ import asyncio
 async def send_request(service_url, payload):
     # await asyncio.sleep(random.uniform(0.01, 0.05))  # Simulate network latency
     print(f"Sending to: {service_url}")
-    async with aiohttp.ClientSession() as session:
-        async with session.post(service_url, json=payload) as response:
-            response_data = await response.json()
-            print(f"Response: {response_data}")
-            return response_data
+    try:
+        async with aiohttp.ClientSession() as session:
+            async with session.post(service_url, json=payload) as response:
+                response_data = await response.json()
+                print(f"Response: {response_data}")
+                return response_data
+    except aiohttp.ClientError as e:
+        print(f"Request failed: {e}")
     print(f"Request sent to {service_url} with payload {payload}")
 
 
