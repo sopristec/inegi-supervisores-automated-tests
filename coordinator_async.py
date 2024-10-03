@@ -12,6 +12,7 @@ import asyncio
 # Placeholder async function for sending requests
 async def send_request(service_url, payload):
     # await asyncio.sleep(random.uniform(0.01, 0.05))  # Simulate network latency
+    print(f"Sending to: {service_url}")
     async with aiohttp.ClientSession() as session:
         async with session.post(service_url, json=payload) as response:
             response_data = await response.json()
@@ -49,35 +50,33 @@ async def distribute_requests(file_data, web_services):
         file_data_iter = iter(file_data)
 
         while total_requests > 0:
-            for service in web_services:
+            for i, service in enumerate(web_services):
                 try:
-                    file_entry = next(file_data_iter)  # Get the next file entry
+                    # Get the next file entry
+                    file_entry = next(file_data_iter)
                 except StopIteration:
-                    file_data_iter = iter(file_data)  # Restart the iteration
-                    file_entry = next(file_data_iter)  # Get the next file entry
+                    # Restart the iteration if we have reached the end
+                    file_data_iter = iter(file_data)
+                    file_entry = next(file_data_iter)
 
                 username = file_entry["username"]
                 file_name = file_entry["file_name"]
 
-                # Determine how many requests to send to each service
-                no_requests = min(
-                    10, file_entry["no_requests"]
-                )  # Send a maximum of 10 requests at a time
-
-                for _ in range(no_requests):
+                # Check how many requests to send
+                if file_entry["no_requests"] > 0:
                     tasks.append(
                         loop.run_in_executor(
-                            pool, asyncio.run, worker(service, file_name, username)
+                            pool,
+                            asyncio.run,
+                            worker(service, file_name, username),
                         )
                     )
-                    total_requests -= 1
+
                     file_entry["no_requests"] -= 1
+                    total_requests -= 1
 
-                if file_entry["no_requests"] <= 0:
-                    file_data_iter = iter(
-                        [entry for entry in file_data if entry["no_requests"] > 0]
-                    )  # Remove completed entries
-
+                if total_requests <= 0:
+                    break
                 await asyncio.sleep(time_per_request)  # sleep here or worker?
         await asyncio.gather(*tasks)
 
