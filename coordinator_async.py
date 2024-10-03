@@ -44,12 +44,14 @@ async def distribute_requests(file_data, web_services):
 
     with ThreadPoolExecutor(max_workers=5 * num_services) as pool:
         loop = asyncio.get_event_loop()
-        tasks = []
 
         # Create an iterator for the file data
         file_data_iter = iter(file_data)
 
         while total_requests > 0:
+            tasks = []  # Reset tasks for each round
+
+            # Send requests to all 10 workers in parallel
             for i, service in enumerate(web_services):
                 try:
                     # Get the next file entry
@@ -77,8 +79,12 @@ async def distribute_requests(file_data, web_services):
 
                 if total_requests <= 0:
                     break
-                await asyncio.sleep(time_per_request)  # sleep here or worker?
-        await asyncio.gather(*tasks)
+
+            # Wait for all tasks (requests) to complete
+            await asyncio.gather(*tasks)
+
+            # Sleep after sending requests to all workers (10 requests per batch)
+            await asyncio.sleep(time_per_request)
 
 
 # Function to read file and N times data from the JSON file
