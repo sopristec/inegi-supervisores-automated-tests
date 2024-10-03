@@ -101,21 +101,23 @@ if __name__ == "__main__":
     HOST_WS_9 = os.environ.get("HOST_WS_9", "localhost")
     HOST_WS_10 = os.environ.get("HOST_WS_10", "localhost")
 
+    endpoint = sys.argv[1]
+
     WEB_SERVICES = [
-        f"http://{HOST_WS_1}:8000/supervisores",
-        f"http://{HOST_WS_2}:8000/supervisores",
-        f"http://{HOST_WS_3}:8000/supervisores",
-        f"http://{HOST_WS_4}:8000/supervisores",
-        f"http://{HOST_WS_5}:8000/supervisores",
-        f"http://{HOST_WS_6}:8000/supervisores",
-        f"http://{HOST_WS_7}:8000/supervisores",
-        f"http://{HOST_WS_8}:8000/supervisores",
-        f"http://{HOST_WS_9}:8000/supervisores",
-        f"http://{HOST_WS_10}:8000/supervisores",
+        f"http://{HOST_WS_1}:8000/{endpoint}",
+        f"http://{HOST_WS_2}:8000/{endpoint}",
+        f"http://{HOST_WS_3}:8000/{endpoint}",
+        f"http://{HOST_WS_4}:8000/{endpoint}",
+        f"http://{HOST_WS_5}:8000/{endpoint}",
+        f"http://{HOST_WS_6}:8000/{endpoint}",
+        f"http://{HOST_WS_7}:8000/{endpoint}",
+        f"http://{HOST_WS_8}:8000/{endpoint}",
+        f"http://{HOST_WS_9}:8000/{endpoint}",
+        f"http://{HOST_WS_10}:8000/{endpoint}",
     ]
 
     # Your JSON data
-    json_file_path = sys.argv[1]
+    json_file_path = sys.argv[2]
 
     # Load file information from JSON file
     file_data = load_file_data(json_file_path)

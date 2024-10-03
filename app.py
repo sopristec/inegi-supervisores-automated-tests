@@ -52,9 +52,7 @@ def entrevistas():
         if not message:
             return jsonify({"error": "No message data received"}), 400
 
-        file_name = message["file_name"]
-
-        file_path = f"Entrevistas/{file_name}"
+        file_path = message["file_name"]
 
         files = {"file": open(file_path, "rb")}
 
