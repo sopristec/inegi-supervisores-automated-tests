@@ -21,19 +21,9 @@ async def send_request(service_url, payload):
 
 
 # Worker function to handle requests for each file
-async def worker(service_url, file_name, request_count, username, time_per_request):
-    tasks = []
+async def worker(service_url, file_name, username):
     payload = {"username": username, "file_name": file_name}
-
-    print(f"count: {request_count}")
-
-    for _ in range(request_count):
-        tasks.append(asyncio.create_task(send_request(service_url, payload)))
-        await asyncio.sleep(
-            time_per_request
-        )  # Pace the requests evenly within the hour
-
-    await asyncio.gather(*tasks)
+    await send_request(service_url, payload)
 
 
 # Function to dynamically distribute requests to web services
@@ -45,8 +35,8 @@ async def distribute_requests(file_data, web_services):
 
     # Calculate how many requests per second to fit within the hour
     requests_per_second = (
-        total_requests / 3600.0
-    )  # Total requests divided by 3600 seconds (1 hour)
+        total_requests / num_services
+    ) / 3600.0  # Total requests divided by 3600 seconds (1 hour)
     time_per_request = (
         1 / requests_per_second if requests_per_second > 0 else 0
     )  # Time delay between each request
@@ -55,36 +45,40 @@ async def distribute_requests(file_data, web_services):
         loop = asyncio.get_event_loop()
         tasks = []
 
-        for file_entry in file_data:
-            username = file_entry["username"]
-            file_name = file_entry["file_name"]
-            no_requests = file_entry["no_requests"]
+        # Create an iterator for the file data
+        file_data_iter = iter(file_data)
 
-            # Distribute the requests evenly across the web services
-            requests_per_service = no_requests // num_services
-            remainder = no_requests % num_services  # Remainder for uneven distribution
+        while total_requests > 0:
+            for service in web_services:
+                try:
+                    file_entry = next(file_data_iter)  # Get the next file entry
+                except StopIteration:
+                    file_data_iter = iter(file_data)  # Restart the iteration
+                    file_entry = next(file_data_iter)  # Get the next file entry
 
-            print(f"request_per_ {requests_per_service}")
+                username = file_entry["username"]
+                file_name = file_entry["file_name"]
 
-            for i, service in enumerate(web_services):
-                # Add one extra request for the first 'remainder' services
-                extra_request = 1 if i < remainder else 0
-                total_requests_for_service = requests_per_service + extra_request
+                # Determine how many requests to send to each service
+                no_requests = min(
+                    10, file_entry["no_requests"]
+                )  # Send a maximum of 10 requests at a time
 
-                tasks.append(
-                    loop.run_in_executor(
-                        pool,
-                        asyncio.run,
-                        worker(
-                            service,
-                            file_name,
-                            total_requests_for_service,
-                            username,
-                            time_per_request,
-                        ),
+                for _ in range(no_requests):
+                    tasks.append(
+                        loop.run_in_executor(
+                            pool, asyncio.run, worker(service, file_name, username)
+                        )
                     )
-                )
+                    total_requests -= 1
+                    file_entry["no_requests"] -= 1
 
+                if file_entry["no_requests"] <= 0:
+                    file_data_iter = iter(
+                        [entry for entry in file_data if entry["no_requests"] > 0]
+                    )  # Remove completed entries
+
+                await asyncio.sleep(time_per_request)  # sleep here or worker?
         await asyncio.gather(*tasks)
 
 
