@@ -18,22 +18,29 @@ async def send_request(service_url, payload):
             async with session.post(service_url, json=payload) as response:
                 response_data = await response.json()
                 print(f"Response: {response_data}")
-                return response_data
+                return response.status
     except aiohttp.ClientError as e:
         print(f"Request failed: {e}")
     print(f"Request sent to {service_url} with payload {payload}")
 
 
 # Worker function to handle requests for each file
-async def worker(service_url, file_name, username, tracking_dict):
+async def worker(service_url, file_name, username, tracking_dict, status_dict):
     payload = {"username": username, "file_name": file_name}
-    await send_request(service_url, payload)
+    response_status = await send_request(service_url, payload)
+
     # Increment the counter for the file name in the tracking dictionary
     tracking_dict[file_name] += 1
 
+    # Initialize the status code count if it doesn't exist for this file
+    if response_status not in status_dict[file_name]:
+        status_dict[file_name][response_status] = 0
+    # Increment the count for the specific status code
+    status_dict[file_name][response_status] += 1
+
 
 # Function to dynamically distribute requests to web services
-async def distribute_requests(file_data, web_services):
+async def distribute_requests(file_data, web_services, log_file):
     total_requests = sum(
         [entry["no_requests"] for entry in file_data]
     )  # Sum all requests
@@ -41,6 +48,9 @@ async def distribute_requests(file_data, web_services):
 
     # Initialize a tracking dictionary for file names
     tracking_dict = {entry["file_name"]: 0 for entry in file_data}
+    status_dict = {
+        entry["file_name"]: {} for entry in file_data  # Empty dict for status codes
+    }
 
     # Calculate how many requests per second to fit within the hour
     requests_per_second = (
@@ -78,7 +88,9 @@ async def distribute_requests(file_data, web_services):
                         loop.run_in_executor(
                             pool,
                             asyncio.run,
-                            worker(service, file_name, username, tracking_dict),
+                            worker(
+                                service, file_name, username, tracking_dict, status_dict
+                            ),
                         )
                     )
 
@@ -94,10 +106,20 @@ async def distribute_requests(file_data, web_services):
             print(f"time_per_request: {time_per_request}")
             # Sleep after sending requests to all workers (10 requests per batch)
             await asyncio.sleep(time_per_request)
-    # Print how many files of each name were sent
-    print("\nSummary of files sent:")
+    # Create a summary of files sent and their status codes
+    summary_lines = []
+    summary_lines.append("\nSummary of files sent:")
     for file_name, count in tracking_dict.items():
-        print(f"{file_name}: {count} requests sent")
+        summary_lines.append(f"{file_name}: {count} requests sent")
+        summary_lines.append(f"Status code breakdown: {status_dict[file_name]}")
+
+    # Print the summary to the console
+    for line in summary_lines:
+        print(line)
+
+    # Log the summary to a file
+    with open(log_file, "a") as log:
+        log.write("\n".join(summary_lines) + "\n")
 
 
 # Function to read file and N times data from the JSON file
@@ -140,5 +162,7 @@ if __name__ == "__main__":
     # Load file information from JSON file
     file_data = load_file_data(json_file_path)
 
+    log_file_path = f"{endpoint}.log"
+
     # Run the distribution of requests
-    asyncio.run(distribute_requests(file_data, WEB_SERVICES))
+    asyncio.run(distribute_requests(file_data, WEB_SERVICES, log_file_path))
