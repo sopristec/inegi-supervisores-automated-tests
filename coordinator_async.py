@@ -25,9 +25,11 @@ async def send_request(service_url, payload):
 
 
 # Worker function to handle requests for each file
-async def worker(service_url, file_name, username):
+async def worker(service_url, file_name, username, tracking_dict):
     payload = {"username": username, "file_name": file_name}
     await send_request(service_url, payload)
+    # Increment the counter for the file name in the tracking dictionary
+    tracking_dict[file_name] += 1
 
 
 # Function to dynamically distribute requests to web services
@@ -36,6 +38,9 @@ async def distribute_requests(file_data, web_services):
         [entry["no_requests"] for entry in file_data]
     )  # Sum all requests
     num_services = len(web_services)
+
+    # Initialize a tracking dictionary for file names
+    tracking_dict = {entry["file_name"]: 0 for entry in file_data}
 
     # Calculate how many requests per second to fit within the hour
     requests_per_second = (
@@ -73,7 +78,7 @@ async def distribute_requests(file_data, web_services):
                         loop.run_in_executor(
                             pool,
                             asyncio.run,
-                            worker(service, file_name, username),
+                            worker(service, file_name, username, tracking_dict),
                         )
                     )
 
@@ -84,10 +89,15 @@ async def distribute_requests(file_data, web_services):
                     break
 
             # Wait for all tasks (requests) to complete
-            await asyncio.gather(*tasks)
+            asyncio.gather(*tasks)
 
+            print(f"time_per_request: {time_per_request}")
             # Sleep after sending requests to all workers (10 requests per batch)
             await asyncio.sleep(time_per_request)
+    # Print how many files of each name were sent
+    print("\nSummary of files sent:")
+    for file_name, count in tracking_dict.items():
+        print(f"{file_name}: {count} requests sent")
 
 
 # Function to read file and N times data from the JSON file
