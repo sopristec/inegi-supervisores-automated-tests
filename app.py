@@ -18,7 +18,7 @@ def get_token_entrevistas():
         "client_id": "sistema.verifica",
         "grant_type": "password",
         "username": "cen_gpo_verif",
-        "password": f"{ENTREVISTAS_PASSWORD}",
+        "password": ENTREVISTAS_PASSWORD,
         "scope": "operaapi",
     }
 
@@ -29,11 +29,10 @@ def get_token_entrevistas():
         token_info = response.json()
         # Extract the access token
         access_token = token_info.get("access_token")
-        print(f"Access Token: {access_token}")
+        print(f"Retrieved Access Token")
         return access_token
     else:
-        print(f"Failed to retrieve token: {response.status_code}")
-        print(response.text)
+        print(f"Failed to retrieve token: {response.status_code}, {response.text}")
         return ""
 
 
@@ -59,7 +58,7 @@ def entrevistas():
         response = requests.post(url, files=files, headers=headers)
 
         return (
-            jsonify({"status": "success", "inegi_response": response.text}),
+            jsonify({"status": response.status_code, "inegi_response": response.text}),
             response.status_code,
         )
     except Exception as e:
