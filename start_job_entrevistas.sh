@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -l
 
 # Check if a parameter is passed
 if [ -z "$1" ]; then
