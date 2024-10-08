@@ -68,60 +68,28 @@ async def distribute_requests(file_data, web_services, log_file):
 
         while total_requests > 0:
             tasks = []  # Reset tasks for each round
+            tasks_needed = 10  # Number of tasks we want to create each round
 
-            # Send requests to all 10 workers in parallel
-            for i, service in enumerate(web_services):
-                if total_requests <= 0:
-                    break
-
-                # Attempt to get the next file entry
-                file_entry = next(file_data_iter, None)
-
-                # If we run out of entries, restart the iterator
-                if file_entry is None:
-                    file_data_iter = iter(file_data)
-                    file_entry = next(file_data_iter)
-
-                username = file_entry["username"]
-                file_name = file_entry["file_name"]
-
-                # Check how many requests to send
-                if file_entry["no_requests"] > 0:
-                    tasks.append(
-                        loop.run_in_executor(
-                            pool,
-                            asyncio.run,
-                            worker(
-                                service, file_name, username, tracking_dict, status_dict
-                            ),
-                        )
-                    )
-
-                    file_entry["no_requests"] -= 1
-                    total_requests -= 1
-
-            if tasks:
-                # Wait for all tasks (requests) to complete
-                asyncio.gather(*tasks)
-
-            print(f"time_per_request: {time_per_request}")
-            # Sleep after sending requests to all workers (10 requests per batch)
-            await asyncio.sleep(time_per_request)
-
-            # If the total_requests is still greater than 0, continue the loop
-            # If it's less than 10 but still has requests, send remaining requests
-            if total_requests > 0 and total_requests < 10:
-                remaining_tasks = []
-                for service in web_services:
-                    if total_requests <= 0:
+            while len(tasks) < tasks_needed and total_requests > 0:
+                # Send requests to all 10 workers in parallel
+                for i, service in enumerate(web_services):
+                    if total_requests <= 0 or len(tasks) >= tasks_needed:
                         break
 
-                    file_entry = next(file_data_iter)
+                    # Attempt to get the next file entry
+                    file_entry = next(file_data_iter, None)
+
+                    # If we run out of entries, restart the iterator
+                    if file_entry is None:
+                        file_data_iter = iter(file_data)
+                        file_entry = next(file_data_iter)
+
                     username = file_entry["username"]
                     file_name = file_entry["file_name"]
 
+                    # Check how many requests to send
                     if file_entry["no_requests"] > 0:
-                        remaining_tasks.append(
+                        tasks.append(
                             loop.run_in_executor(
                                 pool,
                                 asyncio.run,
@@ -134,11 +102,18 @@ async def distribute_requests(file_data, web_services, log_file):
                                 ),
                             )
                         )
+
                         file_entry["no_requests"] -= 1
                         total_requests -= 1
 
-                if remaining_tasks:
-                    await asyncio.gather(*remaining_tasks)
+            if tasks:
+                # Wait for all tasks (requests) to complete
+                asyncio.gather(*tasks)
+
+            print(f"time_per_request: {time_per_request}")
+            # Sleep after sending requests to all workers (10 requests per batch)
+            await asyncio.sleep(time_per_request)
+
     # Create a summary of files sent and their status codes
     summary_lines = []
     summary_lines.append("\nSummary of files sent:")
