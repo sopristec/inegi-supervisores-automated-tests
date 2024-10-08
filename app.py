@@ -58,7 +58,7 @@ def entrevistas():
         response = requests.post(url, files=files, headers=headers)
 
         return (
-            jsonify({"status": response.status_code, "inegi_response": response.text}),
+            jsonify({"status": response.status_code, "message": response.text}),
             response.status_code,
         )
     except Exception as e:
@@ -84,7 +84,7 @@ def supervisor():
 
         # Return a success response
         return (
-            jsonify({"status": "success", "message": "Message processed successfully"}),
+            jsonify({"status": 200, "message": "Message processed successfully"}),
             200,
         )
 
